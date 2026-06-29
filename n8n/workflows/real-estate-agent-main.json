@@ -1,0 +1,107 @@
+{
+  "name": "Real Estate Agent Main",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-agent/whatsapp",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-whatsapp",
+      "name": "WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\nconst provider = body.provider || $env.WHATSAPP_PROVIDER || 'generic';\nconst rawMessage = body.message || body.messages?.[0] || body.entry?.[0]?.changes?.[0]?.value?.messages?.[0] || body;\nconst contact = body.contact || body.contacts?.[0] || body.entry?.[0]?.changes?.[0]?.value?.contacts?.[0] || {};\nconst phone = rawMessage.from || body.phone || contact.wa_id || body.sender || '';\nconst name = contact.profile?.name || body.name || null;\nconst messageType = rawMessage.type || body.message_type || (rawMessage.text || body.text ? 'text' : 'unknown');\nconst text = rawMessage.text?.body || rawMessage.text || body.text || body.caption || '';\nconst media = rawMessage.audio || rawMessage.video || rawMessage.image || body.media || null;\nreturn [{ json: { provider, phone, name, message_type: messageType, text, media, raw: body } }];"
+      },
+      "id": "normalize-payload",
+      "name": "Normalize WhatsApp Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $json;\nconst content = item.text || item.media?.caption || '';\nconst lower = content.toLowerCase();\nconst attrs = {\n  neighborhood: lower.includes('alto do ipiranga') ? 'Alto do Ipiranga' : null,\n  street: lower.includes('rui barbosa') ? 'Rua Rui Barbosa' : lower.includes('bento vieira') ? 'Rua Bento Vieira' : null,\n  property_type: lower.includes('sobrado') ? 'sobrado' : lower.includes('apartamento') ? 'apartamento' : lower.includes('casa') ? 'casa' : null,\n  bedrooms: /3|tres|três/.test(lower) && /dorm/.test(lower) ? 3 : null,\n  parking_spaces: /2|duas|dois/.test(lower) && /(vaga|garagem|carro)/.test(lower) ? 2 : null,\n  visual: lower.includes('portao azul') || lower.includes('portão azul') ? 'portao azul' : null,\n  wants_broker: lower.includes('corretor'),\n  wants_visit: /(visita|sábado|sabado|domingo|horário|horario|agendar)/.test(lower)\n};\nconst intent = attrs.wants_broker ? 'handoff' : attrs.wants_visit ? 'schedule_visit' : 'property_search';\nreturn [{ json: { ...item, normalized_text: content, intent, attrs } }];"
+      },
+      "id": "extract-intent",
+      "name": "Extract Intent and Attributes",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.SUPABASE_URL}}/rest/v1/rpc/search_properties_hybrid",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_agency_id\": \"00000000-0000-0000-0000-000000000001\",\n  \"p_query\": $json.normalized_text,\n  \"p_neighborhood\": $json.attrs.neighborhood,\n  \"p_street\": $json.attrs.street,\n  \"p_property_type\": $json.attrs.property_type,\n  \"p_bedrooms\": $json.attrs.bedrooms,\n  \"p_parking_spaces\": $json.attrs.parking_spaces,\n  \"p_listing_type\": null,\n  \"p_min_price\": null,\n  \"p_max_price\": null,\n  \"p_match_count\": 3,\n  \"p_query_embedding\": null\n}",
+        "options": {}
+      },
+      "id": "search-properties",
+      "name": "Search Properties Hybrid",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [720, 0],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SUPABASE_HTTP_HEADER_AUTH",
+          "name": "Supabase Real Estate REST"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = Array.isArray($json) ? $json : ($json.data || $json.body || []);\nconst previous = $items('Extract Intent and Attributes')[0].json;\nlet reply;\nif (previous.intent === 'handoff') {\n  reply = 'Claro, posso te colocar em contato com um corretor. Enquanto isso, ja posso tentar deixar uma visita pre-agendada para o senhor. Tenho sabado pela manha ou domingo as 14h. Qual funciona melhor?';\n} else if (!candidates.length) {\n  reply = 'Entendi o que voce procura. Para eu localizar sem inventar, voce lembra alguma pista objetiva: rua, bairro, dormitorios, garagem, cor do portao, faixa de preco ou referencia do site?';\n} else if (candidates.length > 1 && candidates[0].total_score < 6) {\n  const opts = candidates.slice(0, 3).map((p) => `${p.street || p.neighborhood}, ${p.bedrooms || '?'} dorms, ${p.parking_spaces || 0} vagas`).join('; ');\n  reply = `Encontrei algumas opcoes parecidas: ${opts}. O senhor lembra se era alguma dessas ruas ou algum detalhe da fachada?`;\n} else {\n  const p = candidates[0];\n  reply = `Pelo que voce descreveu, parece ser ${p.title}. Ele tem ${p.bedrooms || '?'} dormitorios, ${p.parking_spaces || 0} vagas e fica em ${p.street || p.neighborhood}. Quer que eu ja veja uma visita? Tenho sabado pela manha ou domingo as 14h.`;\n}\nreturn [{ json: { ...previous, candidates, reply } }];"
+      },
+      "id": "compose-response",
+      "name": "Compose Agent Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$env.N8N_WEBHOOK_BASE_URL}}/webhook/real-estate-agent/send-whatsapp",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"phone\": $json.phone, \"message\": $json.reply, \"provider\": $json.provider}",
+        "options": {}
+      },
+      "id": "send-whatsapp",
+      "name": "Send WhatsApp Reply",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1200, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": true, \"reply\": $json.reply}"
+      },
+      "id": "webhook-response",
+      "name": "Webhook Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1440, 0]
+    }
+  ],
+  "connections": {
+    "WhatsApp Webhook": {"main": [[{"node": "Normalize WhatsApp Payload", "type": "main", "index": 0}]]},
+    "Normalize WhatsApp Payload": {"main": [[{"node": "Extract Intent and Attributes", "type": "main", "index": 0}]]},
+    "Extract Intent and Attributes": {"main": [[{"node": "Search Properties Hybrid", "type": "main", "index": 0}]]},
+    "Search Properties Hybrid": {"main": [[{"node": "Compose Agent Response", "type": "main", "index": 0}]]},
+    "Compose Agent Response": {"main": [[{"node": "Send WhatsApp Reply", "type": "main", "index": 0}]]},
+    "Send WhatsApp Reply": {"main": [[{"node": "Webhook Response", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "active": false
+}

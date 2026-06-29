@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.log
+node_modules/
+dist/
+tmp/
+backups/
+*.dump
+*.sql.gz
+.DS_Store

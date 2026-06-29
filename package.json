@@ -1,0 +1,14 @@
+{
+  "name": "real-estate-whatsapp-agent-n8n",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "validate:workflows": "node scripts/validate-n8n-workflows.js",
+    "test:simulation": "node scripts/run-simulation-tests.js",
+    "validate:sql": "node scripts/validate-sql-static.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

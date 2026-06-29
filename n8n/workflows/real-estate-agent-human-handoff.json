@@ -1,0 +1,37 @@
+{
+  "name": "Real Estate Agent Human Handoff",
+  "nodes": [
+    {
+      "parameters": {"httpMethod": "POST", "path": "real-estate-agent/handoff", "responseMode": "responseNode", "options": {}},
+      "id": "handoff-webhook",
+      "name": "Handoff Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\nconst summary = `Cliente: ${body.client?.name || 'sem nome'} (${body.client?.phone || body.phone || 'telefone nao informado'}). Intencao: ${body.intent || 'handoff'}. Imovel provavel: ${body.property?.title || 'nao definido'}. Ultima mensagem: ${body.last_message || ''}`;\nconst clientReply = 'Claro, vou pedir para um corretor chamar voce em poucos minutos. Enquanto isso, ja posso tentar deixar uma visita pre-agendada: prefere sabado pela manha ou domingo as 14h?';\nreturn [{ json: { ...body, broker_summary: summary, client_reply: clientReply, handoff_status: 'open' } }];"
+      },
+      "id": "prepare-handoff",
+      "name": "Prepare Handoff",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {"respondWith": "json", "responseBody": "={\"ok\": true, \"handoff_status\": $json.handoff_status, \"client_reply\": $json.client_reply, \"broker_summary\": $json.broker_summary}"},
+      "id": "handoff-response",
+      "name": "Handoff Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [480, 0]
+    }
+  ],
+  "connections": {
+    "Handoff Webhook": {"main": [[{"node": "Prepare Handoff", "type": "main", "index": 0}]]},
+    "Prepare Handoff": {"main": [[{"node": "Handoff Response", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "active": false
+}

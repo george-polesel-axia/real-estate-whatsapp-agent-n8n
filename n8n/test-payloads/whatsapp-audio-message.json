@@ -1,0 +1,13 @@
+{
+  "provider": "generic",
+  "phone": "5511999990002",
+  "name": "Marina",
+  "message_type": "audio",
+  "text": "",
+  "media": {
+    "id": "audio-test-001",
+    "url": "https://example.com/audio/sobrado-portao-azul.ogg",
+    "mime_type": "audio/ogg",
+    "transcription": "Quero ver aquele sobrado com portao azul e duas vagas."
+  }
+}

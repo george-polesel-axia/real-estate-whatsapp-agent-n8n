@@ -1,0 +1,13 @@
+{
+  "provider": "generic",
+  "phone": "5511999990003",
+  "name": "Ana",
+  "message_type": "video",
+  "text": "",
+  "media": {
+    "id": "video-test-001",
+    "url": "https://example.com/video/imovel.mp4",
+    "mime_type": "video/mp4",
+    "transcription": "Quero ver aquele sobrado com portao azul e duas vagas."
+  }
+}

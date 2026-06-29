@@ -1,0 +1,48 @@
+{
+  "name": "Real Estate Agent Calendar",
+  "nodes": [
+    {
+      "parameters": {"httpMethod": "POST", "path": "real-estate-agent/calendar", "responseMode": "responseNode", "options": {}},
+      "id": "calendar-webhook",
+      "name": "Calendar Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\nconst now = new Date();\nconst saturday = new Date(now); saturday.setDate(now.getDate() + ((6 - now.getDay() + 7) % 7 || 7)); saturday.setHours(10,0,0,0);\nconst sunday = new Date(now); sunday.setDate(now.getDate() + ((0 - now.getDay() + 7) % 7 || 7)); sunday.setHours(14,0,0,0);\nreturn [{ json: { ...body, suggested_slots: [saturday.toISOString(), sunday.toISOString()] } }];"
+      },
+      "id": "suggest-slots",
+      "name": "Suggest Calendar Slots",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const slot = $json.selected_slot || $json.suggested_slots[0];\nconst start = new Date(slot);\nconst end = new Date(start.getTime() + 60 * 60 * 1000);\nreturn [{ json: { ...$json, appointment: { start_time: start.toISOString(), end_time: end.toISOString(), status: 'confirmed' } } }];"
+      },
+      "id": "create-appointment-payload",
+      "name": "Create Appointment Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {"respondWith": "json", "responseBody": "={\"ok\": true, \"appointment\": $json.appointment, \"suggested_slots\": $json.suggested_slots}"},
+      "id": "calendar-response",
+      "name": "Calendar Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [720, 0]
+    }
+  ],
+  "connections": {
+    "Calendar Webhook": {"main": [[{"node": "Suggest Calendar Slots", "type": "main", "index": 0}]]},
+    "Suggest Calendar Slots": {"main": [[{"node": "Create Appointment Payload", "type": "main", "index": 0}]]},
+    "Create Appointment Payload": {"main": [[{"node": "Calendar Response", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "active": false
+}
