@@ -53,7 +53,7 @@
       "credentials": {
         "httpHeaderAuth": {
           "id": "SUPABASE_HTTP_HEADER_AUTH",
-          "name": "Supabase Real Estate REST"
+          "name": "db_dev"
         }
       }
     },

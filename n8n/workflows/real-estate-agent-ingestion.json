@@ -35,7 +35,7 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
       "position": [480, 0],
-      "credentials": {"httpHeaderAuth": {"id": "SUPABASE_HTTP_HEADER_AUTH", "name": "Supabase Real Estate REST"}}
+      "credentials": {"httpHeaderAuth": {"id": "SUPABASE_HTTP_HEADER_AUTH", "name": "db_dev"}}
     },
     {
       "parameters": {"respondWith": "json", "responseBody": "={\"ok\": true, \"message\": \"Property validated and sent to Supabase\"}"},
