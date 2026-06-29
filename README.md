@@ -127,6 +127,8 @@ node scripts/run-simulation-tests.js
 
 O relatorio e gravado em `tests/test-report.md`.
 
+Para testar no n8n sem credenciais reais, importe e execute `n8n/workflows/real-estate-agent-main-mock.json`. Ele usa dados ficticios locais e nao chama Supabase, WAHA, OpenAI, Google Calendar ou SMTP.
+
 ## Ativar em producao
 
 1. Confirme backup dos workflows atuais.

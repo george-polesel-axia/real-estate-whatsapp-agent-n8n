@@ -1,0 +1,67 @@
+{
+  "name": "Real Estate Agent Main Mock",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-agent/mock",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "mock-webhook",
+      "name": "Mock WhatsApp Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || $json;\nconst text = body.text || body.message || body.media?.transcription || '';\nconst lower = text.toLowerCase();\nconst attrs = {\n  neighborhood: lower.includes('alto do ipiranga') ? 'Alto do Ipiranga' : null,\n  street: lower.includes('rui barbosa') ? 'Rua Rui Barbosa' : lower.includes('bento vieira') ? 'Rua Bento Vieira' : null,\n  property_type: lower.includes('sobrado') ? 'sobrado' : lower.includes('casa') ? 'casa' : null,\n  bedrooms: /3|tres|três/.test(lower) && /dorm/.test(lower) ? 3 : null,\n  parking_spaces: /2|duas|dois/.test(lower) && /(vaga|garagem|carro)/.test(lower) ? 2 : null,\n  visual: lower.includes('portao azul') || lower.includes('portão azul') ? 'portao azul' : null,\n  wants_broker: lower.includes('corretor'),\n  wants_visit: /(visita|sábado|sabado|domingo|horário|horario|agendar)/.test(lower),\n  nonexistent: lower.includes('castelo') || lower.includes('helicoptero')\n};\nconst intent = attrs.wants_broker ? 'handoff' : attrs.wants_visit ? 'schedule_visit' : 'property_search';\nreturn [{ json: { provider: body.provider || 'mock', phone: body.phone || '5511999990000', name: body.name || 'Cliente Teste', text, intent, attrs, raw: body } }];"
+      },
+      "id": "mock-normalize",
+      "name": "Mock Normalize and Extract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [240, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const properties = [\n  { title: 'Sobrado na Rua Bento Vieira com portao azul', property_type: 'sobrado', neighborhood: 'Alto do Ipiranga', street: 'Rua Bento Vieira', bedrooms: 3, parking_spaces: 2, visual: 'portao azul', short_description: 'Sobrado de 3 dormitorios com 2 vagas e portao azul no Alto do Ipiranga.', total_score: 9.2 },\n  { title: 'Sobrado na Ricardo Jafet', property_type: 'sobrado', neighborhood: 'Alto do Ipiranga', street: 'Avenida Ricardo Jafet', bedrooms: 3, parking_spaces: 1, visual: 'fachada neutra', short_description: 'Sobrado de 3 dormitorios proximo a Ricardo Jafet.', total_score: 7.1 },\n  { title: 'Sobrado na Arcipreste Andrade', property_type: 'sobrado', neighborhood: 'Alto do Ipiranga', street: 'Rua Arcipreste Andrade', bedrooms: 3, parking_spaces: 2, visual: 'jardim', short_description: 'Sobrado de 3 dormitorios e 2 vagas em rua tranquila.', total_score: 7.5 },\n  { title: 'Casa na Rua Rui Barbosa perto da padaria', property_type: 'casa', neighborhood: 'Centro', street: 'Rua Rui Barbosa', bedrooms: 3, parking_spaces: 1, visual: 'casa terrea', short_description: 'Casa de 3 dormitorios na Rua Rui Barbosa, perto da padaria.', total_score: 8.8 }\n];\nconst a = $json.attrs;\nif (a.nonexistent) return [{ json: { ...$json, candidates: [] } }];\nconst candidates = properties.map((p) => {\n  let score = 0;\n  if (a.neighborhood && p.neighborhood === a.neighborhood) score += 2;\n  if (a.street && p.street === a.street) score += 3;\n  if (a.property_type && p.property_type === a.property_type) score += 2;\n  if (a.bedrooms && p.bedrooms === a.bedrooms) score += 1;\n  if (a.parking_spaces && p.parking_spaces >= a.parking_spaces) score += 1;\n  if (a.visual && p.visual.includes(a.visual)) score += 4;\n  return { ...p, total_score: score + p.total_score / 10 };\n}).filter((p) => p.total_score > 0.8).sort((a, b) => b.total_score - a.total_score).slice(0, 3);\nreturn [{ json: { ...$json, candidates } }];"
+      },
+      "id": "mock-search",
+      "name": "Mock Search Properties",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidates = $json.candidates || [];\nlet reply;\nif ($json.intent === 'handoff') {\n  reply = 'Claro, vou pedir para um corretor chamar voce em poucos minutos. Enquanto isso, ja posso tentar deixar uma visita pre-agendada: prefere sabado pela manha ou domingo as 14h?';\n} else if ($json.intent === 'schedule_visit') {\n  reply = 'Perfeito, vou consultar a agenda do corretor e deixar sabado pela manha como primeira opcao. Posso confirmar esse horario para voce?';\n} else if (!candidates.length) {\n  reply = 'Nao encontrei esse imovel com seguranca. Voce lembra alguma pista objetiva: rua, bairro, dormitorios, garagem, cor do portao, faixa de preco ou referencia do site?';\n} else if ($json.attrs.street === 'Rua Rui Barbosa') {\n  reply = 'Na Rua Rui Barbosa temos uma casa de 3 dormitorios perto da padaria. E essa que o senhor viu?';\n} else if ($json.attrs.visual === 'portao azul') {\n  const p = candidates[0];\n  reply = `Pelo que voce descreveu, parece ser ${p.title}. ${p.short_description} Quer que eu te passe os detalhes principais ou ja veja uma visita?`;\n} else {\n  const opts = candidates.map((p) => p.street.replace('Rua ', '').replace('Avenida ', '')).join(', ');\n  reply = `No Alto do Ipiranga temos opcoes com 3 dormitorios na ${opts}. O senhor lembra se era alguma dessas ruas?`;\n}\nreturn [{ json: { ok: true, mode: 'mock', phone: $json.phone, reply, candidates } }];"
+      },
+      "id": "mock-compose",
+      "name": "Mock Compose Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}"
+      },
+      "id": "mock-response",
+      "name": "Mock Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [960, 0]
+    }
+  ],
+  "connections": {
+    "Mock WhatsApp Webhook": {"main": [[{"node": "Mock Normalize and Extract", "type": "main", "index": 0}]]},
+    "Mock Normalize and Extract": {"main": [[{"node": "Mock Search Properties", "type": "main", "index": 0}]]},
+    "Mock Search Properties": {"main": [[{"node": "Mock Compose Response", "type": "main", "index": 0}]]},
+    "Mock Compose Response": {"main": [[{"node": "Mock Response", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"},
+  "active": false
+}

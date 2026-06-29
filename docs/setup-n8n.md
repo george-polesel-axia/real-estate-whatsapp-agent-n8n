@@ -8,6 +8,7 @@ Importe estes arquivos pelo n8n UI:
 - `n8n/workflows/real-estate-agent-ingestion.json`
 - `n8n/workflows/real-estate-agent-calendar.json`
 - `n8n/workflows/real-estate-agent-human-handoff.json`
+- `n8n/workflows/real-estate-agent-main-mock.json` para teste sem credenciais externas
 
 ## Credenciais
 
@@ -30,6 +31,8 @@ node scripts/validate-n8n-workflows.js
 ```
 
 Teste o webhook com os payloads em `n8n/test-payloads/`.
+
+Enquanto WAHA/OpenAI/Calendar/e-mail nao estiverem prontos, use `Real Estate Agent Main Mock`. Ele nao chama servicos externos e responde via webhook com dados ficticios.
 
 ## Producao
 

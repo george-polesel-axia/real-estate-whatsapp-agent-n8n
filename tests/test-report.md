@@ -1,6 +1,6 @@
 # Relatorio de Testes
 
-Data: 2026-06-29T12:10:22.608Z
+Data: 2026-06-29T20:06:47.301Z
 
 ## Cenario 1 - desambiguacao e agendamento
 
