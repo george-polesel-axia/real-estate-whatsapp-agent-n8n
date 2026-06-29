@@ -1,5 +1,11 @@
 {
+  "updatedAt": "2026-06-29T12:30:34.545Z",
+  "createdAt": "2026-06-29T12:30:34.545Z",
+  "id": "iJ8autffHhYTOGxe",
   "name": "Real Estate Agent Main",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
       "parameters": {
@@ -12,7 +18,10 @@
       "name": "WhatsApp Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
     },
     {
       "parameters": {
@@ -22,7 +31,10 @@
       "name": "Normalize WhatsApp Payload",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 0]
+      "position": [
+        240,
+        0
+      ]
     },
     {
       "parameters": {
@@ -32,7 +44,10 @@
       "name": "Extract Intent and Attributes",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [480, 0]
+      "position": [
+        480,
+        0
+      ]
     },
     {
       "parameters": {
@@ -49,11 +64,14 @@
       "name": "Search Properties Hybrid",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [720, 0],
+      "position": [
+        720,
+        0
+      ],
       "credentials": {
         "httpHeaderAuth": {
           "id": "SUPABASE_HTTP_HEADER_AUTH",
-          "name": "db_dev"
+          "name": "Supabase Real Estate REST"
         }
       }
     },
@@ -65,7 +83,10 @@
       "name": "Compose Agent Response",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [960, 0]
+      "position": [
+        960,
+        0
+      ]
     },
     {
       "parameters": {
@@ -80,7 +101,10 @@
       "name": "Send WhatsApp Reply",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [1200, 0]
+      "position": [
+        1200,
+        0
+      ]
     },
     {
       "parameters": {
@@ -91,17 +115,108 @@
       "name": "Webhook Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [1440, 0]
+      "position": [
+        1440,
+        0
+      ]
     }
   ],
   "connections": {
-    "WhatsApp Webhook": {"main": [[{"node": "Normalize WhatsApp Payload", "type": "main", "index": 0}]]},
-    "Normalize WhatsApp Payload": {"main": [[{"node": "Extract Intent and Attributes", "type": "main", "index": 0}]]},
-    "Extract Intent and Attributes": {"main": [[{"node": "Search Properties Hybrid", "type": "main", "index": 0}]]},
-    "Search Properties Hybrid": {"main": [[{"node": "Compose Agent Response", "type": "main", "index": 0}]]},
-    "Compose Agent Response": {"main": [[{"node": "Send WhatsApp Reply", "type": "main", "index": 0}]]},
-    "Send WhatsApp Reply": {"main": [[{"node": "Webhook Response", "type": "main", "index": 0}]]}
+    "WhatsApp Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize WhatsApp Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize WhatsApp Payload": {
+      "main": [
+        [
+          {
+            "node": "Extract Intent and Attributes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Intent and Attributes": {
+      "main": [
+        [
+          {
+            "node": "Search Properties Hybrid",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Properties Hybrid": {
+      "main": [
+        [
+          {
+            "node": "Compose Agent Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose Agent Response": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp Reply": {
+      "main": [
+        [
+          {
+            "node": "Webhook Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": {"executionOrder": "v1"},
-  "active": false
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "98658681-991c-4fc3-a78c-570edaf18d81",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-06-29T12:30:34.548Z",
+      "createdAt": "2026-06-29T12:30:34.548Z",
+      "role": "workflow:owner",
+      "workflowId": "iJ8autffHhYTOGxe",
+      "projectId": "DFk15nxgwgH1cdCE",
+      "project": {
+        "updatedAt": "2026-02-09T18:41:33.640Z",
+        "createdAt": "2025-07-31T11:57:33.237Z",
+        "id": "DFk15nxgwgH1cdCE",
+        "name": "George Polesel <george.polesel@axiaia.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "c58c324d-3420-4441-9aa8-48b8e03eea97"
+      }
+    }
+  ]
 }

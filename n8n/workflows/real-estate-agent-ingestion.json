@@ -1,13 +1,27 @@
 {
+  "updatedAt": "2026-06-29T12:30:34.539Z",
+  "createdAt": "2026-06-29T12:30:34.539Z",
+  "id": "3jbasxgKIUt9oIvh",
   "name": "Real Estate Agent Ingestion",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
-      "parameters": {"httpMethod": "POST", "path": "real-estate-agent/ingest-property", "responseMode": "responseNode", "options": {}},
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-agent/ingest-property",
+        "responseMode": "responseNode",
+        "options": {}
+      },
       "id": "ingestion-webhook",
       "name": "Property Ingestion Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
     },
     {
       "parameters": {
@@ -17,7 +31,10 @@
       "name": "Validate Property",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 0]
+      "position": [
+        240,
+        0
+      ]
     },
     {
       "parameters": {
@@ -34,23 +51,95 @@
       "name": "Create or Update Property",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [480, 0],
-      "credentials": {"httpHeaderAuth": {"id": "SUPABASE_HTTP_HEADER_AUTH", "name": "db_dev"}}
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "SUPABASE_HTTP_HEADER_AUTH",
+          "name": "Supabase Real Estate REST"
+        }
+      }
     },
     {
-      "parameters": {"respondWith": "json", "responseBody": "={\"ok\": true, \"message\": \"Property validated and sent to Supabase\"}"},
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": true, \"message\": \"Property validated and sent to Supabase\"}"
+      },
       "id": "ingestion-response",
       "name": "Ingestion Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [720, 0]
+      "position": [
+        720,
+        0
+      ]
     }
   ],
   "connections": {
-    "Property Ingestion Webhook": {"main": [[{"node": "Validate Property", "type": "main", "index": 0}]]},
-    "Validate Property": {"main": [[{"node": "Create or Update Property", "type": "main", "index": 0}]]},
-    "Create or Update Property": {"main": [[{"node": "Ingestion Response", "type": "main", "index": 0}]]}
+    "Property Ingestion Webhook": {
+      "main": [
+        [
+          {
+            "node": "Validate Property",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Property": {
+      "main": [
+        [
+          {
+            "node": "Create or Update Property",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or Update Property": {
+      "main": [
+        [
+          {
+            "node": "Ingestion Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": {"executionOrder": "v1"},
-  "active": false
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "9eb5ea9e-0db2-48ca-a219-803ea745923b",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-06-29T12:30:34.540Z",
+      "createdAt": "2026-06-29T12:30:34.540Z",
+      "role": "workflow:owner",
+      "workflowId": "3jbasxgKIUt9oIvh",
+      "projectId": "DFk15nxgwgH1cdCE",
+      "project": {
+        "updatedAt": "2026-02-09T18:41:33.640Z",
+        "createdAt": "2025-07-31T11:57:33.237Z",
+        "id": "DFk15nxgwgH1cdCE",
+        "name": "George Polesel <george.polesel@axiaia.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "c58c324d-3420-4441-9aa8-48b8e03eea97"
+      }
+    }
+  ]
 }

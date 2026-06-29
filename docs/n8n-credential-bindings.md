@@ -19,7 +19,9 @@ Data: 2026-06-29
 
 ## Impacto nos workflows
 
-Os workflows versionados foram ajustados para referenciar `db_dev` nos nodes HTTP de Supabase.
+Os workflows versionados foram inicialmente ajustados para referenciar `db_dev` nos nodes HTTP de Supabase.
+
+Nota de sincronizacao: no export remoto de 2026-06-29, os nodes HTTP de Supabase ainda aparecem vinculados ao nome `Supabase Real Estate REST`. Se `db_dev` for a credencial definitiva, ajustar esses nodes no n8n ou renomear a credencial antiga conforme a decisao operacional.
 
 Os nodes de WhatsApp, OpenAI, Google Calendar e e-mail ainda devem ser conectados no n8n conforme a credencial real estiver valida. Enquanto `waha` estiver instavel, os workflows devem permanecer inativos ou rodar apenas com payloads simulados.
 

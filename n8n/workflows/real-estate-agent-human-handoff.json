@@ -1,13 +1,27 @@
 {
+  "updatedAt": "2026-06-29T12:30:34.533Z",
+  "createdAt": "2026-06-29T12:30:34.533Z",
+  "id": "KYr7qOMxbZlcmJ4x",
   "name": "Real Estate Agent Human Handoff",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
-      "parameters": {"httpMethod": "POST", "path": "real-estate-agent/handoff", "responseMode": "responseNode", "options": {}},
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-agent/handoff",
+        "responseMode": "responseNode",
+        "options": {}
+      },
       "id": "handoff-webhook",
       "name": "Handoff Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
     },
     {
       "parameters": {
@@ -17,21 +31,78 @@
       "name": "Prepare Handoff",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 0]
+      "position": [
+        240,
+        0
+      ]
     },
     {
-      "parameters": {"respondWith": "json", "responseBody": "={\"ok\": true, \"handoff_status\": $json.handoff_status, \"client_reply\": $json.client_reply, \"broker_summary\": $json.broker_summary}"},
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": true, \"handoff_status\": $json.handoff_status, \"client_reply\": $json.client_reply, \"broker_summary\": $json.broker_summary}"
+      },
       "id": "handoff-response",
       "name": "Handoff Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [480, 0]
+      "position": [
+        480,
+        0
+      ]
     }
   ],
   "connections": {
-    "Handoff Webhook": {"main": [[{"node": "Prepare Handoff", "type": "main", "index": 0}]]},
-    "Prepare Handoff": {"main": [[{"node": "Handoff Response", "type": "main", "index": 0}]]}
+    "Handoff Webhook": {
+      "main": [
+        [
+          {
+            "node": "Prepare Handoff",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Handoff": {
+      "main": [
+        [
+          {
+            "node": "Handoff Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": {"executionOrder": "v1"},
-  "active": false
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "0fb84420-55c6-4011-9330-5ea64fee2e00",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-06-29T12:30:34.537Z",
+      "createdAt": "2026-06-29T12:30:34.537Z",
+      "role": "workflow:owner",
+      "workflowId": "KYr7qOMxbZlcmJ4x",
+      "projectId": "DFk15nxgwgH1cdCE",
+      "project": {
+        "updatedAt": "2026-02-09T18:41:33.640Z",
+        "createdAt": "2025-07-31T11:57:33.237Z",
+        "id": "DFk15nxgwgH1cdCE",
+        "name": "George Polesel <george.polesel@axiaia.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "c58c324d-3420-4441-9aa8-48b8e03eea97"
+      }
+    }
+  ]
 }

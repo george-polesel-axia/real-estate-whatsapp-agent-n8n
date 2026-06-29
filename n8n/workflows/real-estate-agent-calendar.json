@@ -1,13 +1,27 @@
 {
+  "updatedAt": "2026-06-29T12:30:34.527Z",
+  "createdAt": "2026-06-29T12:30:34.527Z",
+  "id": "JKOAsQ6lNbj4Bhlr",
   "name": "Real Estate Agent Calendar",
+  "description": null,
+  "active": false,
+  "isArchived": false,
   "nodes": [
     {
-      "parameters": {"httpMethod": "POST", "path": "real-estate-agent/calendar", "responseMode": "responseNode", "options": {}},
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "real-estate-agent/calendar",
+        "responseMode": "responseNode",
+        "options": {}
+      },
       "id": "calendar-webhook",
       "name": "Calendar Webhook",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [0, 0]
+      "position": [
+        0,
+        0
+      ]
     },
     {
       "parameters": {
@@ -17,7 +31,10 @@
       "name": "Suggest Calendar Slots",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [240, 0]
+      "position": [
+        240,
+        0
+      ]
     },
     {
       "parameters": {
@@ -27,22 +44,89 @@
       "name": "Create Appointment Payload",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [480, 0]
+      "position": [
+        480,
+        0
+      ]
     },
     {
-      "parameters": {"respondWith": "json", "responseBody": "={\"ok\": true, \"appointment\": $json.appointment, \"suggested_slots\": $json.suggested_slots}"},
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\"ok\": true, \"appointment\": $json.appointment, \"suggested_slots\": $json.suggested_slots}"
+      },
       "id": "calendar-response",
       "name": "Calendar Response",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1,
-      "position": [720, 0]
+      "position": [
+        720,
+        0
+      ]
     }
   ],
   "connections": {
-    "Calendar Webhook": {"main": [[{"node": "Suggest Calendar Slots", "type": "main", "index": 0}]]},
-    "Suggest Calendar Slots": {"main": [[{"node": "Create Appointment Payload", "type": "main", "index": 0}]]},
-    "Create Appointment Payload": {"main": [[{"node": "Calendar Response", "type": "main", "index": 0}]]}
+    "Calendar Webhook": {
+      "main": [
+        [
+          {
+            "node": "Suggest Calendar Slots",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Suggest Calendar Slots": {
+      "main": [
+        [
+          {
+            "node": "Create Appointment Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Appointment Payload": {
+      "main": [
+        [
+          {
+            "node": "Calendar Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   },
-  "settings": {"executionOrder": "v1"},
-  "active": false
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": null,
+  "versionId": "c2bd0bd7-65d1-43db-980f-b8eae4133dbf",
+  "activeVersionId": null,
+  "versionCounter": 1,
+  "triggerCount": 0,
+  "tags": [],
+  "shared": [
+    {
+      "updatedAt": "2026-06-29T12:30:34.530Z",
+      "createdAt": "2026-06-29T12:30:34.530Z",
+      "role": "workflow:owner",
+      "workflowId": "JKOAsQ6lNbj4Bhlr",
+      "projectId": "DFk15nxgwgH1cdCE",
+      "project": {
+        "updatedAt": "2026-02-09T18:41:33.640Z",
+        "createdAt": "2025-07-31T11:57:33.237Z",
+        "id": "DFk15nxgwgH1cdCE",
+        "name": "George Polesel <george.polesel@axiaia.com.br>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "c58c324d-3420-4441-9aa8-48b8e03eea97"
+      }
+    }
+  ]
 }
